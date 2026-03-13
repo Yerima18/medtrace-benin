@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UserCheck, UserX, Search } from 'lucide-react';
 
 const ROLE_COLORS: Record<string, string> = {
@@ -13,15 +14,16 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const r = await fetch('/api/admin/users', { credentials: 'include' });
       if (r.ok) setUsers(await r.json());
-      else setError('Failed to load users');
+      else setError(t('adminUsers.errorFallback'));
     } catch {
-      setError('Failed to connect to server');
+      setError(t('adminUsers.serverError'));
     } finally {
       setLoading(false);
     }
@@ -39,7 +41,7 @@ export default function AdminUsers() {
     if (r.ok) fetchUsers();
     else {
       const d = await r.json();
-      alert(d.error || 'Failed to update user status');
+      alert(d.error || t('adminUsers.updateError'));
     }
   };
 
@@ -59,14 +61,14 @@ export default function AdminUsers() {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
-          <p className="text-slate-500">{users.length} total users</p>
+          <h1 className="text-2xl font-bold text-slate-900">{t('adminUsers.title')}</h1>
+          <p className="text-slate-500">{t('adminUsers.totalUsers', { count: users.length })}</p>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder={t('adminUsers.searchPlaceholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-64"
@@ -81,13 +83,13 @@ export default function AdminUsers() {
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="bg-slate-50 text-slate-700 uppercase text-xs font-semibold border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Details</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">Registered</th>
-                <th className="px-6 py-3">Action</th>
+                <th className="px-6 py-3">{t('adminUsers.colName')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colEmail')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colRole')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colDetails')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colStatus')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colRegistered')}</th>
+                <th className="px-6 py-3">{t('adminUsers.colAction')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -107,7 +109,7 @@ export default function AdminUsers() {
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${u.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                       {u.is_active ? <UserCheck className="h-3 w-3" /> : <UserX className="h-3 w-3" />}
-                      {u.is_active ? 'Active' : 'Inactive'}
+                      {u.is_active ? t('adminUsers.statusActive') : t('adminUsers.statusInactive')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-500">{new Date(u.created_at).toLocaleDateString()}</td>
@@ -121,7 +123,7 @@ export default function AdminUsers() {
                             : 'text-emerald-600 hover:bg-emerald-50 border border-emerald-200'
                         }`}
                       >
-                        {u.is_active ? 'Deactivate' : 'Activate'}
+                        {u.is_active ? t('adminUsers.deactivate') : t('adminUsers.activate')}
                       </button>
                     )}
                   </td>
@@ -129,7 +131,7 @@ export default function AdminUsers() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500">No users found.</td>
+                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500">{t('adminUsers.noUsers')}</td>
                 </tr>
               )}
             </tbody>

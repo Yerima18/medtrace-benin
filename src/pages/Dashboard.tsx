@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import {
   Activity, Users, Package, AlertTriangle, CheckCircle,
@@ -21,6 +22,7 @@ function StatCard({ title, value, icon, bg }: { title: string; value: number | s
 // ─── Admin Dashboard ──────────────────────────────────────────────────────────
 
 function AdminDashboard({ stats }: { stats: any }) {
+  const { t } = useTranslation();
   const [insights, setInsights] = useState<string | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [insightsError, setInsightsError] = useState('');
@@ -32,9 +34,9 @@ function AdminDashboard({ stats }: { stats: any }) {
       const r = await fetch('/api/admin/ai-insights', { credentials: 'include' });
       const data = await r.json();
       if (r.ok) setInsights(data.insights);
-      else setInsightsError(data.error || 'Failed to load insights');
+      else setInsightsError(data.error || t('dashboard.admin.insightsErrorFallback'));
     } catch {
-      setInsightsError('Failed to connect to AI service');
+      setInsightsError(t('dashboard.admin.insightsErrorFallback'));
     } finally {
       setInsightsLoading(false);
     }
@@ -48,14 +50,14 @@ function AdminDashboard({ stats }: { stats: any }) {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Registered Pharmacies"   value={stats.totalPharmacies}   icon={<Users className="h-6 w-6 text-blue-600" />}    bg="bg-blue-50" />
-        <StatCard title="Registered Medicines"    value={stats.totalMedicines}    icon={<Package className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
-        <StatCard title="Total Scans"             value={stats.totalScans}        icon={<Activity className="h-6 w-6 text-indigo-600" />} bg="bg-indigo-50" />
-        <StatCard title="Suspicious Scans"        value={stats.suspiciousScans}   icon={<AlertTriangle className="h-6 w-6 text-rose-600" />} bg="bg-rose-50" />
-        <StatCard title="Distributors"            value={stats.totalDistributors} icon={<Truck className="h-6 w-6 text-amber-600" />}    bg="bg-amber-50" />
-        <StatCard title="Total Batches"           value={stats.totalBatches}      icon={<Package className="h-6 w-6 text-violet-600" />}  bg="bg-violet-50" />
-        <StatCard title="QR Codes Generated"      value={stats.totalQRCodes}      icon={<TrendingUp className="h-6 w-6 text-teal-600" />} bg="bg-teal-50" />
-        <StatCard title="Unresolved Alerts"       value={stats.unresolvedAlerts}  icon={<AlertTriangle className="h-6 w-6 text-orange-600" />} bg="bg-orange-50" />
+        <StatCard title={t('dashboard.admin.registeredPharmacies')} value={stats.totalPharmacies}   icon={<Users className="h-6 w-6 text-blue-600" />}    bg="bg-blue-50" />
+        <StatCard title={t('dashboard.admin.registeredMedicines')}  value={stats.totalMedicines}    icon={<Package className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
+        <StatCard title={t('dashboard.admin.totalScans')}           value={stats.totalScans}        icon={<Activity className="h-6 w-6 text-indigo-600" />} bg="bg-indigo-50" />
+        <StatCard title={t('dashboard.admin.suspiciousScans')}      value={stats.suspiciousScans}   icon={<AlertTriangle className="h-6 w-6 text-rose-600" />} bg="bg-rose-50" />
+        <StatCard title={t('dashboard.admin.distributors')}         value={stats.totalDistributors} icon={<Truck className="h-6 w-6 text-amber-600" />}    bg="bg-amber-50" />
+        <StatCard title={t('dashboard.admin.totalBatches')}         value={stats.totalBatches}      icon={<Package className="h-6 w-6 text-violet-600" />}  bg="bg-violet-50" />
+        <StatCard title={t('dashboard.admin.qrCodesGenerated')}     value={stats.totalQRCodes}      icon={<TrendingUp className="h-6 w-6 text-teal-600" />} bg="bg-teal-50" />
+        <StatCard title={t('dashboard.admin.unresolvedAlerts')}     value={stats.unresolvedAlerts}  icon={<AlertTriangle className="h-6 w-6 text-orange-600" />} bg="bg-orange-50" />
       </div>
 
       {/* AI Insights */}
@@ -63,7 +65,7 @@ function AdminDashboard({ stats }: { stats: any }) {
         <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-indigo-50 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <Brain className="h-5 w-5 text-violet-500" />
-            AI Security Insights
+            {t('dashboard.admin.aiInsightsTitle')}
           </h2>
           <button
             onClick={loadInsights}
@@ -71,17 +73,17 @@ function AdminDashboard({ stats }: { stats: any }) {
             className="text-sm text-violet-600 hover:text-violet-800 flex items-center gap-1 font-medium disabled:opacity-50"
           >
             {insightsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            {insights ? 'Refresh' : 'Generate Insights'}
+            {insights ? t('dashboard.admin.refreshInsights') : t('dashboard.admin.generateInsights')}
           </button>
         </div>
         <div className="p-6">
           {!insights && !insightsLoading && !insightsError && (
-            <p className="text-slate-500 text-sm">Click "Generate Insights" to get an AI-powered analysis of recent security patterns.</p>
+            <p className="text-slate-500 text-sm">{t('dashboard.admin.insightsPlaceholder')}</p>
           )}
           {insightsLoading && (
             <div className="flex items-center gap-3 text-violet-600">
               <Loader2 className="h-5 w-5 animate-spin" />
-              <span>Analysing scan patterns...</span>
+              <span>{t('dashboard.admin.analysingPatterns')}</span>
             </div>
           )}
           {insightsError && <p className="text-rose-600 text-sm">{insightsError}</p>}
@@ -96,10 +98,10 @@ function AdminDashboard({ stats }: { stats: any }) {
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-rose-500" />
-            Recent Security Alerts
+            {t('dashboard.admin.recentAlerts')}
           </h2>
           <Link to="/admin/users" className="text-sm text-emerald-600 hover:underline font-medium">
-            Manage Users →
+            {t('dashboard.admin.manageUsers')}
           </Link>
         </div>
         <div className="divide-y divide-slate-100">
@@ -121,13 +123,13 @@ function AdminDashboard({ stats }: { stats: any }) {
                     onClick={() => resolveAlert(alert.id)}
                     className="text-xs text-emerald-600 hover:text-emerald-800 font-medium whitespace-nowrap"
                   >
-                    Resolve
+                    {t('dashboard.admin.resolve')}
                   </button>
                 )}
               </div>
             ))
           ) : (
-            <div className="p-8 text-center text-slate-500">No recent alerts. System is secure.</div>
+            <div className="p-8 text-center text-slate-500">{t('dashboard.admin.noAlerts')}</div>
           )}
         </div>
       </div>
@@ -138,31 +140,33 @@ function AdminDashboard({ stats }: { stats: any }) {
 // ─── Distributor Dashboard ────────────────────────────────────────────────────
 
 function DistributorDashboard({ stats }: { stats: any }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard title="Total Batches"         value={stats.totalBatches}   icon={<Package className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
-        <StatCard title="Total QR Codes"        value={stats.totalQRCodes}   icon={<Activity className="h-6 w-6 text-blue-600" />}    bg="bg-blue-50" />
-        <StatCard title="Batches In Transit"    value={stats.shippedBatches} icon={<Truck className="h-6 w-6 text-amber-600" />}      bg="bg-amber-50" />
+        <StatCard title={t('dashboard.distributor.totalBatches')}      value={stats.totalBatches}   icon={<Package className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
+        <StatCard title={t('dashboard.distributor.totalQRCodes')}       value={stats.totalQRCodes}   icon={<Activity className="h-6 w-6 text-blue-600" />}    bg="bg-blue-50" />
+        <StatCard title={t('dashboard.distributor.batchesInTransit')}   value={stats.shippedBatches} icon={<Truck className="h-6 w-6 text-amber-600" />}      bg="bg-amber-50" />
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-800">Recent Batches</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{t('dashboard.distributor.recentBatches')}</h2>
           <Link to="/register-medicine" className="text-sm text-emerald-600 hover:underline font-medium">
-            + New Batch
+            {t('dashboard.distributor.newBatch')}
           </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="bg-slate-50 text-slate-700 uppercase text-xs font-semibold">
               <tr>
-                <th className="px-6 py-3">Medicine</th>
-                <th className="px-6 py-3">Batch Number</th>
-                <th className="px-6 py-3">Qty</th>
-                <th className="px-6 py-3">Expires</th>
-                <th className="px-6 py-3">Dispensed</th>
-                <th className="px-6 py-3">Registered</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colMedicine')}</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colBatchNumber')}</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colQty')}</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colExpires')}</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colDispensed')}</th>
+                <th className="px-6 py-3">{t('dashboard.distributor.colRegistered')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -184,7 +188,7 @@ function DistributorDashboard({ stats }: { stats: any }) {
               ))}
               {(!stats.recentBatches || stats.recentBatches.length === 0) && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">No batches registered yet.</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">{t('dashboard.distributor.noBatches')}</td>
                 </tr>
               )}
             </tbody>
@@ -198,20 +202,22 @@ function DistributorDashboard({ stats }: { stats: any }) {
 // ─── Pharmacy Dashboard ───────────────────────────────────────────────────────
 
 function PharmacyDashboard({ stats }: { stats: any }) {
+  const { t } = useTranslation();
+
   const confirmReceive = async (batchId: number) => {
     const r = await fetch(`/api/medicines/batch/${batchId}/receive`, {
       method: 'POST',
       credentials: 'include',
     });
     if (r.ok) window.location.reload();
-    else alert('Failed to confirm receipt');
+    else alert(t('dashboard.pharmacy.failedReceipt'));
   };
 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <StatCard title="Total Scans Performed" value={stats.totalScans}    icon={<Activity className="h-6 w-6 text-indigo-600" />}  bg="bg-indigo-50" />
-        <StatCard title="Dispensed Today"        value={stats.dispensedToday} icon={<CheckCircle className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
+        <StatCard title={t('dashboard.pharmacy.totalScans')}    value={stats.totalScans}    icon={<Activity className="h-6 w-6 text-indigo-600" />}  bg="bg-indigo-50" />
+        <StatCard title={t('dashboard.pharmacy.dispensedToday')} value={stats.dispensedToday} icon={<CheckCircle className="h-6 w-6 text-emerald-600" />} bg="bg-emerald-50" />
       </div>
 
       {stats.incomingShipments?.length > 0 && (
@@ -219,7 +225,7 @@ function PharmacyDashboard({ stats }: { stats: any }) {
           <div className="px-6 py-4 border-b border-amber-100 bg-amber-50">
             <h2 className="text-lg font-semibold text-amber-800 flex items-center gap-2">
               <Truck className="h-5 w-5 text-amber-600" />
-              Incoming Shipments ({stats.incomingShipments.length})
+              {t('dashboard.pharmacy.incomingShipments', { count: stats.incomingShipments.length })}
             </h2>
           </div>
           <div className="divide-y divide-slate-100">
@@ -227,14 +233,16 @@ function PharmacyDashboard({ stats }: { stats: any }) {
               <div key={s.id} className="p-4 flex items-center gap-4">
                 <div className="flex-1">
                   <p className="font-medium text-slate-900">{s.medicine_name}</p>
-                  <p className="text-sm text-slate-500">Batch: {s.batch_number} · {s.quantity} units · From: {s.from_name}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Shipped: {new Date(s.shipped_at).toLocaleString()}</p>
+                  <p className="text-sm text-slate-500">
+                    {t('dashboard.pharmacy.batch')}: {s.batch_number} · {s.quantity} {t('dashboard.pharmacy.units')} · {t('dashboard.pharmacy.from')}: {s.from_name}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-0.5">{t('dashboard.pharmacy.shipped')}: {new Date(s.shipped_at).toLocaleString()}</p>
                 </div>
                 <button
                   onClick={() => confirmReceive(s.batch_id)}
                   className="bg-emerald-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-emerald-700 font-medium"
                 >
-                  Confirm Receipt
+                  {t('dashboard.pharmacy.confirmReceipt')}
                 </button>
               </div>
             ))}
@@ -244,9 +252,9 @@ function PharmacyDashboard({ stats }: { stats: any }) {
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-800">Recent Scans</h2>
+          <h2 className="text-lg font-semibold text-slate-800">{t('dashboard.pharmacy.recentScans')}</h2>
           <Link to="/verify" className="text-sm text-emerald-600 hover:underline font-medium">
-            Scan Medicine →
+            {t('dashboard.pharmacy.scanMedicine')}
           </Link>
         </div>
         <div className="divide-y divide-slate-100">
@@ -264,7 +272,7 @@ function PharmacyDashboard({ stats }: { stats: any }) {
               </div>
             ))
           ) : (
-            <div className="p-8 text-center text-slate-500">No scans yet.</div>
+            <div className="p-8 text-center text-slate-500">{t('dashboard.pharmacy.noScans')}</div>
           )}
         </div>
       </div>
@@ -276,6 +284,7 @@ function PharmacyDashboard({ stats }: { stats: any }) {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -302,11 +311,13 @@ export default function Dashboard() {
     </div>
   );
 
+  const roleLabel = user?.role ? (t(`dashboard.roles.${user.role}`, { defaultValue: user.role }) as string) : '';
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h1 className="text-2xl font-bold text-slate-900">Welcome, {user?.name}</h1>
-        <p className="text-slate-500 capitalize">{user?.role} Dashboard</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('dashboard.welcome', { name: user?.name })}</h1>
+        <p className="text-slate-500">{t('dashboard.roleDashboard', { role: roleLabel })}</p>
       </div>
 
       {user?.role === 'admin'       && stats && <AdminDashboard stats={stats} />}
@@ -316,12 +327,12 @@ export default function Dashboard() {
       {user?.role === 'patient' && (
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center">
           <ShieldCheck className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Patient Portal</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('dashboard.patient.title')}</h2>
           <p className="text-slate-600 mb-6 max-w-md mx-auto">
-            Always verify your medicine before use. Scan the QR code on the packaging.
+            {t('dashboard.patient.description')}
           </p>
           <Link to="/verify" className="inline-flex items-center justify-center px-6 py-3 rounded-md text-white bg-emerald-600 hover:bg-emerald-700 font-medium">
-            Scan Medicine
+            {t('dashboard.patient.scanBtn')}
           </Link>
         </div>
       )}

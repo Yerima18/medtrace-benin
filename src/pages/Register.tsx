@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { User, Mail, Lock, Building, MapPin, FileText } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,10 +38,10 @@ export default function Register() {
         login(data.user);
         navigate('/dashboard');
       } else {
-        setError(data.error || 'Registration failed');
+        setError(data.error || t('register.errorFallback'));
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('register.networkError'));
     }
   };
 
@@ -48,12 +50,12 @@ export default function Register() {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-slate-100">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-            Create an account
+            {t('register.title')}
           </h2>
           <p className="mt-2 text-center text-sm text-slate-600">
-            Already have an account?{' '}
+            {t('register.subtitle')}{' '}
             <Link to="/login" className="font-medium text-emerald-600 hover:text-emerald-500">
-              Sign in
+              {t('register.subtitleLink')}
             </Link>
           </p>
         </div>
@@ -63,10 +65,10 @@ export default function Register() {
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">Account Type</label>
+              <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">{t('register.accountTypeLabel')}</label>
               <select
                 id="role"
                 name="role"
@@ -74,16 +76,16 @@ export default function Register() {
                 onChange={handleChange}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm rounded-md"
               >
-                <option value="patient">Patient (Public User)</option>
-                <option value="pharmacy">Pharmacy</option>
-                <option value="distributor">Distributor / Importer</option>
+                <option value="patient">{t('register.rolePatient')}</option>
+                <option value="pharmacy">{t('register.rolePharmacy')}</option>
+                <option value="distributor">{t('register.roleDistributor')}</option>
               </select>
             </div>
 
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                {formData.role === 'pharmacy' || formData.role === 'distributor' ? 
-                  <Building className="h-5 w-5 text-slate-400" /> : 
+                {formData.role === 'pharmacy' || formData.role === 'distributor' ?
+                  <Building className="h-5 w-5 text-slate-400" /> :
                   <User className="h-5 w-5 text-slate-400" />
                 }
               </div>
@@ -92,7 +94,7 @@ export default function Register() {
                 type="text"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                placeholder={formData.role === 'patient' ? "Full Name" : "Organization Name"}
+                placeholder={formData.role === 'patient' ? t('register.namePlaceholderPerson') : t('register.namePlaceholderOrg')}
                 value={formData.name}
                 onChange={handleChange}
               />
@@ -107,7 +109,7 @@ export default function Register() {
                 type="email"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                placeholder="Email address"
+                placeholder={t('register.emailPlaceholder')}
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -123,13 +125,13 @@ export default function Register() {
                 required
                 minLength={8}
                 className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                placeholder="Password"
+                placeholder={t('register.passwordPlaceholder')}
                 value={formData.password}
                 onChange={handleChange}
               />
             </div>
             <p className="text-xs text-slate-500 -mt-2">
-              Min. 8 characters, one uppercase letter, one number.
+              {t('register.passwordHint')}
             </p>
 
             {formData.role === 'pharmacy' && (
@@ -143,7 +145,7 @@ export default function Register() {
                     type="text"
                     required
                     className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                    placeholder="Pharmacy Address"
+                    placeholder={t('register.locationPlaceholder')}
                     value={formData.location}
                     onChange={handleChange}
                   />
@@ -157,7 +159,7 @@ export default function Register() {
                     type="text"
                     required
                     className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-                    placeholder="License Number"
+                    placeholder={t('register.licensePlaceholder')}
                     value={formData.license_number}
                     onChange={handleChange}
                   />
@@ -171,7 +173,7 @@ export default function Register() {
               type="submit"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
             >
-              Create Account
+              {t('register.submitBtn')}
             </button>
           </div>
         </form>
