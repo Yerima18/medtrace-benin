@@ -1,0 +1,18 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+
+# Environment — never commit secrets
+.env
+.env.local
+.env.production
+.env*
+!.env.example
+
+# SQLite databases (including test DBs)
+*.db
+*.db-wal
+*.db-shm

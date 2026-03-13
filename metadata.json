@@ -1,0 +1,5 @@
+{
+  "name": "MedTrace Benin",
+  "description": "Medicine traceability system designed to fight counterfeit drugs in Benin and West Africa.",
+  "requestFramePermissions": ["camera", "geolocation"]
+}
