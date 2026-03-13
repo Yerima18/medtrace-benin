@@ -105,7 +105,7 @@ describe('POST /api/auth/login', () => {
     expect(res.status).toBe(200);
     expect(res.body.user).toMatchObject({ email: 'logintest@test.com' });
     expect(res.body.token).toBeUndefined(); // token must not be in body
-    const cookies = res.headers['set-cookie'] as string[];
+    const cookies = ([] as string[]).concat(res.headers['set-cookie'] ?? []);
     expect(cookies.some((c: string) => c.includes('HttpOnly'))).toBe(true);
   });
 
@@ -163,7 +163,7 @@ describe('POST /api/auth/logout', () => {
 
     expect(logoutRes.status).toBe(200);
     // Cookie should be cleared (Max-Age=0 or expires in past)
-    const logoutCookies = logoutRes.headers['set-cookie'] as string[];
+    const logoutCookies = ([] as string[]).concat(logoutRes.headers['set-cookie'] ?? []);
     expect(logoutCookies.some((c: string) => c.includes('medtrace_token=;'))).toBe(true);
   });
 });
